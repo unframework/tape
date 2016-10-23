@@ -46,7 +46,7 @@ runSample = ->
   soundSource.start 0
   soundSource.connect reverbNode
   soundSource.playbackRate.setValueAtTime 1, context.currentTime
-  soundSource.playbackRate.linearRampToValueAtTime 0.975 + Math.random() * 0.1, context.currentTime + 1
+  soundSource.playbackRate.linearRampToValueAtTime 0.99 + Math.random() * 0.04, context.currentTime + 1
 
 vdomLive (renderLive) ->
   document.body.style.textAlign = 'center';
