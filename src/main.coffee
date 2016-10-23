@@ -30,20 +30,31 @@ reverbNode.connect(context.destination)
 context.decodeAudioData echoData, (buffer) ->
   reverbNode.buffer = buffer
 
+tapeDelay = context.createDelay()
+tapeDelay.delayTime.value = 0.5
+
+tapeDelayFade = context.createGain()
+tapeDelayFade.gain.value = 0.6
+
 # low-pass
-filter = context.createBiquadFilter()
-filter.type = 'lowpass'
-filter.Q.value = 52.5
-filter.frequency.setValueAtTime 440, context.currentTime
-filter.frequency.linearRampToValueAtTime 1760, context.currentTime + 20
-filter.Q.setValueAtTime 15, context.currentTime
-filter.Q.linearRampToValueAtTime(5, context.currentTime + 20)
-filter.connect(reverbNode)
+tapeDelayFilter = context.createBiquadFilter()
+tapeDelayFilter.type = 'lowpass'
+tapeDelayFilter.Q.value = 0.8
+tapeDelayFilter.frequency.value = 880
+# tapeDelayFilter.frequency.linearRampToValueAtTime 1760, context.currentTime + 20
+# tapeDelayFilter.Q.linearRampToValueAtTime(5, context.currentTime + 20)
+
+tapeDelay.connect(tapeDelayFilter)
+tapeDelayFilter.connect(tapeDelayFade)
+tapeDelayFade.connect(tapeDelay)
+
+tapeDelay.connect(reverbNode)
 
 runSample = ->
   soundSource = context.createBufferSource()
   soundSource.buffer = if Math.random() > 0.5 then bass2Buffer else bassBuffer
   soundSource.start 0
+  soundSource.connect tapeDelay
   soundSource.connect reverbNode
   soundSource.playbackRate.setValueAtTime 1, context.currentTime
   soundSource.playbackRate.linearRampToValueAtTime 0.99 + Math.random() * 0.04, context.currentTime + 1
